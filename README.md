@@ -1,8 +1,8 @@
-# 🎮 GameTracker - Clase Full Stack
-## URLs Dinámicas, Métodos HTTP y Presentación del Reto Final
+# 🎮 Clase Full Stack - APIs REST
+## URLs Dinámicas, Métodos HTTP y Presentación del Reto GameTracker
 
 **Duración:** 3 horas  
-**Objetivo:** Dominar APIs RESTful y presentar el reto GameTracker
+**Objetivo:** Dominar APIs RESTful con práctica de Torneos de Gaming y presentar el reto GameTracker
 
 ---
 
@@ -30,7 +30,7 @@
 - Dividir en equipos de 3-4 personas
 - Cada equipo escoge un nombre de videojuego famoso
 - Preguntas rápidas sobre Express (30 segundos por respuesta)
-- El equipo ganador elige el primer videojuego del ejemplo
+- El equipo ganador elige el primer jugador del ejemplo
 
 ### Preguntas de Repaso:
 1. ¿Qué es Express y para qué sirve?
@@ -44,11 +44,13 @@
 
 ## 🔗 Parte 2: Parámetros de URL (30 min)
 
-### Concepto Básico con Analogía de Videojuegos
+### Proyecto de Práctica: API de Torneos de Gaming 🏆
 
-**Piénsalo como un inventario de juegos:**
-- URL normal: `/juegos` → "Muéstrame todos los juegos"
-- URL con parámetro: `/juego/1` → "Muéstrame el juego número 1"
+**Concepto:** Vamos a crear una API para gestionar jugadores de un torneo de videojuegos
+
+**Piénsalo como una lista de participantes:**
+- URL normal: `/jugadores` → "Muéstrame todos los jugadores"
+- URL con parámetro: `/jugador/1` → "Muéstrame el jugador número 1"
 
 ### Código de Práctica
 
@@ -59,85 +61,93 @@ const app = express();
 
 app.use(express.json());
 
-// Array de videojuegos (será nuestro "inventario")
-let juegos = [
-    { id: 1, titulo: "The Legend of Zelda", genero: "Aventura", plataforma: "Nintendo Switch" },
-    { id: 2, titulo: "God of War", genero: "Acción", plataforma: "PlayStation" },
-    { id: 3, titulo: "Halo", genero: "FPS", plataforma: "Xbox" }
+// Array de jugadores del torneo (será nuestra base de datos temporal)
+let jugadores = [
+    { id: 1, nickname: "DragonSlayer", juego: "League of Legends", nivel: "Pro", pais: "Colombia" },
+    { id: 2, nickname: "ShadowNinja", juego: "CS:GO", nivel: "Semi-Pro", pais: "México" },
+    { id: 3, nickname: "FireMage", juego: "Valorant", nivel: "Amateur", pais: "Argentina" }
 ];
 
-// Obtener juego por ID
-app.get('/juego/:id', (req, res) => {
+// Obtener jugador por ID
+app.get('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const juego = juegos.find(j => j.id === id);
+    const jugador = jugadores.find(j => j.id === id);
     
-    if (!juego) {
-        return res.status(404).json({ error: "Juego no encontrado en el inventario" });
+    if (!jugador) {
+        return res.status(404).json({ error: "Jugador no encontrado en el torneo" });
     }
     
-    res.json(juego);
+    res.json(jugador);
 });
 
 app.listen(3000, () => {
-    console.log('GameTracker API en http://localhost:3000');
+    console.log('🏆 API Torneo Gaming en http://localhost:3000');
 });
 ```
 
 ### 🧪 Pruebas en el navegador:
-- `http://localhost:3000/juego/1`
-- `http://localhost:3000/juego/2`
-- `http://localhost:3000/juego/999`
+- `http://localhost:3000/jugador/1`
+- `http://localhost:3000/jugador/2`
+- `http://localhost:3000/jugador/999`
 
-### 🏆 Dinámica: "Encuentra tu Juego Favorito"
+### 🏆 Dinámica: "Encuentra tu Gamer"
 
 **Actividad (10 min):**
-- Cada estudiante agrega su videojuego favorito al array
-- Prueban obtener diferentes juegos por ID
+- Cada estudiante agrega un jugador con su propio nickname
+- Prueban obtener diferentes jugadores por ID
 - El que encuentre el error 404 más creativo gana un punto
 
 ---
 
 ## 🔍 Parte 3: Query Parameters (30 min)
 
-### Concepto con Analogía de Filtros de Steam
+### Concepto con Filtros de Torneo
 
-**Como filtrar juegos en una tienda:**
-- `/juegos?genero=RPG` → "Solo juegos de RPG"
-- `/juegos?limite=5` → "Solo los primeros 5 juegos"
-- `/juegos?plataforma=PC&limite=3` → "3 juegos de PC"
+**Como filtrar participantes de un torneo:**
+- `/jugadores?juego=Valorant` → "Solo jugadores de Valorant"
+- `/jugadores?nivel=Pro` → "Solo jugadores profesionales"
+- `/jugadores?pais=Colombia&limite=2` → "2 jugadores colombianos"
 
 ### Código de Práctica
 
 ```javascript
 // Agregar al servidor.js
 
-// Obtener todos los juegos (con filtros opcionales)
-app.get('/juegos', (req, res) => {
+// Obtener todos los jugadores (con filtros opcionales)
+app.get('/jugadores', (req, res) => {
     const limite = parseInt(req.query.limite);
-    const genero = req.query.genero;
-    const plataforma = req.query.plataforma;
+    const juego = req.query.juego;
+    const nivel = req.query.nivel;
+    const pais = req.query.pais;
     const buscar = req.query.buscar;
     
-    let resultado = juegos;
+    let resultado = jugadores;
     
-    // Filtrar por género
-    if (genero) {
+    // Filtrar por juego
+    if (juego) {
         resultado = resultado.filter(j => 
-            j.genero.toLowerCase().includes(genero.toLowerCase())
+            j.juego.toLowerCase().includes(juego.toLowerCase())
         );
     }
     
-    // Filtrar por plataforma
-    if (plataforma) {
+    // Filtrar por nivel
+    if (nivel) {
         resultado = resultado.filter(j => 
-            j.plataforma.toLowerCase().includes(plataforma.toLowerCase())
+            j.nivel.toLowerCase().includes(nivel.toLowerCase())
         );
     }
     
-    // Búsqueda por título
+    // Filtrar por país
+    if (pais) {
+        resultado = resultado.filter(j => 
+            j.pais.toLowerCase().includes(pais.toLowerCase())
+        );
+    }
+    
+    // Búsqueda por nickname
     if (buscar) {
         resultado = resultado.filter(j => 
-            j.titulo.toLowerCase().includes(buscar.toLowerCase())
+            j.nickname.toLowerCase().includes(buscar.toLowerCase())
         );
     }
     
@@ -148,38 +158,38 @@ app.get('/juegos', (req, res) => {
     
     res.json({
         total: resultado.length,
-        juegos: resultado
+        jugadores: resultado
     });
 });
 ```
 
 ### 🧪 Pruebas de filtros:
-- `http://localhost:3000/juegos`
-- `http://localhost:3000/juegos?limite=2`
-- `http://localhost:3000/juegos?genero=accion`
-- `http://localhost:3000/juegos?buscar=zelda`
-- `http://localhost:3000/juegos?plataforma=xbox&limite=1`
+- `http://localhost:3000/jugadores`
+- `http://localhost:3000/jugadores?limite=2`
+- `http://localhost:3000/jugadores?juego=valorant`
+- `http://localhost:3000/jugadores?nivel=pro`
+- `http://localhost:3000/jugadores?pais=colombia&limite=1`
 
-### 💪 Ejercicio Grupal: "Construye tu Filtro Perfecto"
+### 💪 Ejercicio Grupal: "Construye tu Filtro de Torneo"
 
 **En equipos (15 min):**
-1. Cada equipo agrega 5 juegos más al array
+1. Cada equipo agrega 5 jugadores más al array
 2. Crean 3 URLs diferentes con combinaciones de filtros
-3. Presentan sus filtros más creativos al grupo
-4. Votan por el filtro más útil
+3. Presentan sus filtros más útiles al grupo
+4. Votan por el filtro más práctico para organizar torneos
 
 ---
 
 ## ☕ DESCANSO - 15 MINUTOS
-*¡Perfecto momento para hablar de sus videojuegos favoritos!*
+*¡Perfecto momento para hablar de sus nicknames favoritos y juegos competitivos!*
 
 ---
 
-## 📝 Parte 4: Método POST - Crear Juegos (30 min)
+## 📝 Parte 4: Método POST - Registrar Jugadores (30 min)
 
-### Concepto: Agregar Juegos a la Biblioteca
+### Concepto: Inscribir Nuevos Participantes
 
-**POST = Agregar un nuevo juego a tu colección**
+**POST = Registrar un nuevo jugador en el torneo**
 
 ### Código de Práctica
 
@@ -188,33 +198,46 @@ app.get('/juegos', (req, res) => {
 
 let proximoId = 4;
 
-// Crear nuevo juego
-app.post('/juegos', (req, res) => {
-    const { titulo, genero, plataforma } = req.body;
+// Registrar nuevo jugador
+app.post('/jugadores', (req, res) => {
+    const { nickname, juego, nivel, pais } = req.body;
     
     // Validaciones
-    if (!titulo) {
-        return res.status(400).json({ error: "El título es obligatorio" });
+    if (!nickname) {
+        return res.status(400).json({ error: "El nickname es obligatorio" });
     }
-    if (!genero) {
-        return res.status(400).json({ error: "El género es obligatorio" });
+    if (!juego) {
+        return res.status(400).json({ error: "El juego es obligatorio" });
     }
-    if (!plataforma) {
-        return res.status(400).json({ error: "La plataforma es obligatoria" });
+    if (!nivel) {
+        return res.status(400).json({ error: "El nivel es obligatorio" });
+    }
+    if (!pais) {
+        return res.status(400).json({ error: "El país es obligatorio" });
     }
     
-    const nuevoJuego = {
+    // Verificar que el nickname no esté repetido
+    const nicknameExiste = jugadores.find(j => 
+        j.nickname.toLowerCase() === nickname.toLowerCase()
+    );
+    
+    if (nicknameExiste) {
+        return res.status(409).json({ error: "Ese nickname ya está registrado" });
+    }
+    
+    const nuevoJugador = {
         id: proximoId++,
-        titulo: titulo,
-        genero: genero,
-        plataforma: plataforma
+        nickname: nickname,
+        juego: juego,
+        nivel: nivel,
+        pais: pais
     };
     
-    juegos.push(nuevoJuego);
+    jugadores.push(nuevoJugador);
     
     res.status(201).json({
-        mensaje: "¡Juego agregado a tu biblioteca!",
-        juego: nuevoJuego
+        mensaje: "¡Jugador registrado exitosamente en el torneo!",
+        jugador: nuevoJugador
     });
 });
 ```
@@ -222,64 +245,75 @@ app.post('/juegos', (req, res) => {
 ### 🧪 Probar en RapidAPI Client o Postman:
 
 **Method:** POST  
-**URL:** `http://localhost:3000/juegos`  
+**URL:** `http://localhost:3000/jugadores`  
 **Headers:** `Content-Type: application/json`  
 **Body:**
 ```json
 {
-    "titulo": "Cyberpunk 2077",
-    "genero": "RPG",
-    "plataforma": "PC"
+    "nickname": "ThunderStrike",
+    "juego": "Fortnite",
+    "nivel": "Amateur",
+    "pais": "Chile"
 }
 ```
 
-### 🏁 Competencia: "Quién Agrega Más Juegos"
+### 🏁 Competencia: "Registro Masivo de Jugadores"
 
 **Reglas (15 min):**
-- Cada estudiante tiene 5 minutos para agregar juegos
-- Gana puntos por: creatividad del título, variedad de géneros
-- Pierde puntos por: datos duplicados, errores de validación
-- Al final vemos quién construyó la mejor biblioteca
+- Cada estudiante tiene 5 minutos para registrar jugadores
+- Gana puntos por: nicknames creativos, variedad de juegos y países
+- Pierde puntos por: nicknames duplicados, errores de validación
+- Al final vemos quién organizó el torneo más diverso
 
 ---
 
-## ✏️ Parte 5: Método PUT - Actualizar Juegos (30 min)
+## ✏️ Parte 5: Método PUT - Actualizar Información (30 min)
 
-### Concepto: Editar Información de Juegos
+### Concepto: Editar Datos de Jugadores
 
-**PUT = Actualizar completamente un juego existente**
+**PUT = Actualizar completamente la información de un jugador**
 
 ### Código de Práctica
 
 ```javascript
 // Agregar al servidor.js
 
-// Actualizar juego completo
-app.put('/juego/:id', (req, res) => {
+// Actualizar información completa del jugador
+app.put('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const { titulo, genero, plataforma } = req.body;
+    const { nickname, juego, nivel, pais } = req.body;
     
     // Validaciones
-    if (!titulo || !genero || !plataforma) {
+    if (!nickname || !juego || !nivel || !pais) {
         return res.status(400).json({ 
-            error: "Se requieren todos los campos: titulo, genero, plataforma" 
+            error: "Se requieren todos los campos: nickname, juego, nivel, pais" 
         });
     }
     
-    const juego = juegos.find(j => j.id === id);
+    const jugador = jugadores.find(j => j.id === id);
     
-    if (!juego) {
-        return res.status(404).json({ error: "Juego no encontrado" });
+    if (!jugador) {
+        return res.status(404).json({ error: "Jugador no encontrado" });
+    }
+    
+    // Verificar que el nuevo nickname no esté repetido (excepto el actual)
+    const nicknameExiste = jugadores.find(j => 
+        j.id !== id && j.nickname.toLowerCase() === nickname.toLowerCase()
+    );
+    
+    if (nicknameExiste) {
+        return res.status(409).json({ error: "Ese nickname ya está en uso" });
     }
     
     // Actualizar todos los campos
-    juego.titulo = titulo;
-    juego.genero = genero;
-    juego.plataforma = plataforma;
+    jugador.nickname = nickname;
+    jugador.juego = juego;
+    jugador.nivel = nivel;
+    jugador.pais = pais;
     
     res.json({
-        mensaje: "Juego actualizado exitosamente",
-        juego: juego
+        mensaje: "Información del jugador actualizada exitosamente",
+        jugador: jugador
     });
 });
 ```
@@ -287,55 +321,56 @@ app.put('/juego/:id', (req, res) => {
 ### 🧪 Ejemplo de actualización:
 
 **Method:** PUT  
-**URL:** `http://localhost:3000/juego/1`  
+**URL:** `http://localhost:3000/jugador/1`  
 **Body:**
 ```json
 {
-    "titulo": "The Legend of Zelda: Breath of the Wild",
-    "genero": "Aventura/Acción",
-    "plataforma": "Nintendo Switch"
+    "nickname": "DragonSlayer_Pro",
+    "juego": "League of Legends",
+    "nivel": "Pro",
+    "pais": "Colombia"
 }
 ```
 
-### 👥 Práctica en Parejas: "Corrige la Información"
+### 👥 Práctica en Parejas: "Actualización de Perfiles"
 
 **Actividad (20 min):**
-1. **Persona A:** Crea 3 juegos con información "incorrecta"
-2. **Persona B:** Los corrige usando PUT
+1. **Persona A:** Registra 3 jugadores con información básica
+2. **Persona B:** Los actualiza con información más completa (cambio de nivel, juego especializado, etc.)
 3. Intercambian roles
 4. Verifican los cambios con GET
 
-**Ejemplos de "errores":** nombres incompletos, géneros genéricos, plataformas obsoletas
+**Ejemplos de actualizaciones:** Amateur → Semi-Pro, cambio de juego principal, país de residencia
 
 ---
 
-## 🗑️ Parte 6: Método DELETE + Reto GameTracker (30 min)
+## 🗑️ Parte 6: Método DELETE + Presentación GameTracker (30 min)
 
-### DELETE - Eliminar Juegos (15 min)
+### DELETE - Descalificar Jugadores (15 min)
 
-**DELETE = Remover un juego de la biblioteca**
+**DELETE = Remover un jugador del torneo**
 
 ### Código de Práctica
 
 ```javascript
 // Agregar al servidor.js
 
-// Eliminar juego
-app.delete('/juego/:id', (req, res) => {
+// Descalificar/eliminar jugador
+app.delete('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
     
-    const indice = juegos.findIndex(j => j.id === id);
+    const indice = jugadores.findIndex(j => j.id === id);
     
     if (indice === -1) {
-        return res.status(404).json({ error: "Juego no encontrado" });
+        return res.status(404).json({ error: "Jugador no encontrado" });
     }
     
-    const juegoEliminado = juegos.splice(indice, 1)[0];
+    const jugadorEliminado = jugadores.splice(indice, 1)[0];
     
     res.json({ 
-        mensaje: "Juego eliminado de tu biblioteca", 
-        juego: juegoEliminado,
-        totalRestante: juegos.length
+        mensaje: "Jugador descalificado del torneo", 
+        jugador: jugadorEliminado,
+        participantesRestantes: jugadores.length
     });
 });
 ```
@@ -343,20 +378,24 @@ app.delete('/juego/:id', (req, res) => {
 ### 🔄 Ejercicio Final CRUD Completo
 
 **Flujo completo en RapidAPI Client (10 min):**
-1. GET `/juegos` - Ver biblioteca actual
-2. POST `/juegos` - Agregar tu juego favorito
-3. GET `/juego/:id` - Ver el juego creado
-4. PUT `/juego/:id` - Actualizar información
-5. DELETE `/juego/:id` - Eliminar el juego
-6. GET `/juegos` - Verificar que se eliminó
+1. GET `/jugadores` - Ver participantes actuales
+2. POST `/jugadores` - Registrar un nuevo participante
+3. GET `/jugador/:id` - Ver el jugador registrado
+4. PUT `/jugador/:id` - Actualizar su información
+5. DELETE `/jugador/:id` - Descalificar al jugador
+6. GET `/jugadores` - Verificar que se eliminó
 
 ---
 
 ## 🎮 ¡PRESENTACIÓN DEL RETO GAMETRACKER!
 
+### Transición: De Torneos a Biblioteca Personal
+
+**"Ahora que saben manejar datos de jugadores en torneos, vamos a crear algo personal: su propia biblioteca de videojuegos"**
+
 ### El Desafío Final
 
-**Ahora que dominas los métodos HTTP, ¡es hora del desafío final!**
+**¡Es hora del desafío final! Un proyecto completamente diferente:**
 
 | Tecnología | Descripción |
 |------------|-------------|
@@ -365,16 +404,17 @@ app.delete('/juego/:id', (req, res) => {
 | 🗄️ **Base de Datos** | Mongoose + Atlas |
 | 📝 **CRUD** | Juegos + Reseñas |
 
-### 🎯 El Reto: Crear tu GameTracker Personal
+### 🎯 El Reto: GameTracker - Tu Biblioteca Personal
 
-**Una aplicación completa donde puedas:**
-- 📚 Gestionar tu biblioteca de videojuegos
-- ⭐ Escribir reseñas con puntuaciones
-- 🔍 Filtrar por género, plataforma, etc.
-- 📊 Ver estadísticas de tus juegos
+**Una aplicación completamente diferente donde puedas:**
+- 📚 Gestionar tu colección personal de videojuegos
+- ⭐ Escribir reseñas detalladas con puntuaciones
+- 🔍 Filtrar tu biblioteca por género, plataforma, etc.
+- 📊 Ver estadísticas de tus juegos jugados
 - ✅ Marcar juegos como completados
+- ⏱️ Registrar horas jugadas
 
-### 🗄️ Entidades del CRUD
+### 🗄️ Entidades del CRUD (Diferentes a la Práctica)
 
 #### 1. Videojuegos (Games)
 ```javascript
@@ -407,20 +447,20 @@ app.delete('/juego/:id', (req, res) => {
 }
 ```
 
-### ⚙️ Backend - API RESTful
+### ⚙️ Backend - API RESTful GameTracker
 
 #### Endpoints para Videojuegos:
-- `GET /api/juegos` - Obtener todos los juegos
+- `GET /api/juegos` - Obtener todos los juegos de tu biblioteca
 - `GET /api/juegos/:id` - Obtener un juego específico
-- `POST /api/juegos` - Crear nuevo juego
-- `PUT /api/juegos/:id` - Actualizar juego
-- `DELETE /api/juegos/:id` - Eliminar juego
+- `POST /api/juegos` - Agregar juego a tu colección
+- `PUT /api/juegos/:id` - Actualizar información del juego
+- `DELETE /api/juegos/:id` - Remover juego de tu biblioteca
 
 #### Endpoints para Reseñas:
-- `GET /api/reseñas` - Obtener todas las reseñas
-- `GET /api/reseñas/juego/:juegoId` - Reseñas de un juego
-- `POST /api/reseñas` - Crear nueva reseña
-- `PUT /api/reseñas/:id` - Actualizar reseña
+- `GET /api/reseñas` - Obtener todas tus reseñas
+- `GET /api/reseñas/juego/:juegoId` - Reseñas de un juego específico
+- `POST /api/reseñas` - Escribir nueva reseña
+- `PUT /api/reseñas/:id` - Actualizar reseña existente
 - `DELETE /api/reseñas/:id` - Eliminar reseña
 
 #### Requisitos Técnicos:
@@ -428,102 +468,127 @@ app.delete('/juego/:id', (req, res) => {
 - Relaciones entre entidades (populate)
 - Manejo de errores
 - Middleware de validación
+- Autenticación (opcional)
 
 ### ⚛️ Frontend - React
 
 #### Componentes Principales:
-- **ListaJuegos** - Vista de la biblioteca
-- **TarjetaJuego** - Card individual
-- **FormularioJuego** - Agregar/editar
+- **BibliotecaJuegos** - Vista principal de la colección
+- **TarjetaJuego** - Card individual de cada juego
+- **FormularioJuego** - Agregar/editar juegos
 - **ListaReseñas** - Vista de reseñas
-- **FormularioReseña** - Escribir reseñas
+- **FormularioReseña** - Escribir/editar reseñas
+- **EstadisticasPersonales** - Dashboard de estadísticas
 
 #### Funcionalidades Core:
-- Ver biblioteca completa
-- Agregar nuevos juegos
-- Marcar como completados
-- Sistema de puntuación ⭐
-- Escribir y editar reseñas
-- Diseño responsive
+- Ver biblioteca completa con imágenes
+- Agregar nuevos juegos con portadas
+- Marcar juegos como completados
+- Sistema de puntuación con estrellas ⭐
+- Escribir reseñas detalladas
+- Registro de horas jugadas
+- Diseño responsive y atractivo
 
 ### ✨ Características Extra (Opcionales)
 
 #### Filtros y Búsqueda:
-- Filtro por género
-- Filtro por plataforma
-- Solo juegos completados
-- Búsqueda por título
+- Filtro por género (RPG, Acción, etc.)
+- Filtro por plataforma (PC, PlayStation, etc.)
+- Solo juegos completados/por completar
+- Búsqueda por título o desarrollador
+- Ordenamiento por fecha, puntuación, etc.
 
 #### Funcionalidades Avanzadas:
-- Estadísticas personales
+- Dashboard de estadísticas personales
 - Modo oscuro 🌙
-- Drag & drop para imágenes
-- Gráficos de progreso
+- Drag & drop para subir portadas
+- Gráficos de progreso y tiempo jugado
+- Lista de deseos (Wishlist)
+- Exportar biblioteca a PDF
 
-### 📋 Entregables
+### 📋 Entregables del Reto
 
 | ✅ | Componente | Descripción |
 |----|------------|-------------|
-| ✅ | **Backend** | API REST completa con estructura de carpetas clara, modelos de Mongoose y validaciones implementadas |
-| ✅ | **Frontend** | Aplicación React funcional con todos los componentes, navegación y consumo de API |
-| ✅ | **Documentación** | README detallado con instrucciones de instalación y uso |
-| ✅ | **Datos de Prueba** | Base de datos populada con videojuegos y reseñas de ejemplo |
+| ✅ | **Backend** | API REST completa con estructura clara, modelos Mongoose y validaciones |
+| ✅ | **Frontend** | Aplicación React funcional con diseño atractivo y todas las funcionalidades |
+| ✅ | **Documentación** | README detallado con instrucciones de instalación y capturas |
+| ✅ | **Datos de Prueba** | Base de datos populada con juegos populares y reseñas ejemplo |
+| ✅ | **Deploy** | Aplicación desplegada en plataformas como Netlify/Vercel + Railway/Render |
+
+### 🎯 Diferencias Clave entre Práctica y Reto:
+
+| Aspecto | Práctica (Torneo) | Reto (GameTracker) |
+|---------|-------------------|-------------------|
+| **Temática** | Jugadores de torneo | Biblioteca personal |
+| **Entidades** | Jugadores | Juegos + Reseñas |
+| **Funcionalidad** | Gestión de participantes | Colección personal |
+| **Complejidad** | Una entidad simple | Dos entidades relacionadas |
+| **Frontend** | Solo backend | Full Stack completo |
+| **Base de Datos** | Array en memoria | MongoDB + Mongoose |
 
 ---
 
-## 📋 Código Completo Final
+## 📋 Código Completo Final de la Práctica
 
 ```javascript
-// servidor.js - GameTracker API Completa
+// servidor.js - API Torneo Gaming Completa
 const express = require('express');
 const app = express();
 
 app.use(express.json());
 
-let juegos = [
-    { id: 1, titulo: "The Legend of Zelda", genero: "Aventura", plataforma: "Nintendo Switch" },
-    { id: 2, titulo: "God of War", genero: "Acción", plataforma: "PlayStation" },
-    { id: 3, titulo: "Halo", genero: "FPS", plataforma: "Xbox" }
+let jugadores = [
+    { id: 1, nickname: "DragonSlayer", juego: "League of Legends", nivel: "Pro", pais: "Colombia" },
+    { id: 2, nickname: "ShadowNinja", juego: "CS:GO", nivel: "Semi-Pro", pais: "México" },
+    { id: 3, nickname: "FireMage", juego: "Valorant", nivel: "Amateur", pais: "Argentina" }
 ];
 
 let proximoId = 4;
 
-// GET - Obtener juego por ID
-app.get('/juego/:id', (req, res) => {
+// GET - Obtener jugador por ID
+app.get('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const juego = juegos.find(j => j.id === id);
+    const jugador = jugadores.find(j => j.id === id);
     
-    if (!juego) {
-        return res.status(404).json({ error: "Juego no encontrado" });
+    if (!jugador) {
+        return res.status(404).json({ error: "Jugador no encontrado" });
     }
     
-    res.json(juego);
+    res.json(jugador);
 });
 
-// GET - Obtener todos los juegos con filtros
-app.get('/juegos', (req, res) => {
+// GET - Obtener todos los jugadores con filtros
+app.get('/jugadores', (req, res) => {
     const limite = parseInt(req.query.limite);
-    const genero = req.query.genero;
-    const plataforma = req.query.plataforma;
+    const juego = req.query.juego;
+    const nivel = req.query.nivel;
+    const pais = req.query.pais;
     const buscar = req.query.buscar;
     
-    let resultado = juegos;
+    let resultado = jugadores;
     
-    if (genero) {
+    if (juego) {
         resultado = resultado.filter(j => 
-            j.genero.toLowerCase().includes(genero.toLowerCase())
+            j.juego.toLowerCase().includes(juego.toLowerCase())
         );
     }
     
-    if (plataforma) {
+    if (nivel) {
         resultado = resultado.filter(j => 
-            j.plataforma.toLowerCase().includes(plataforma.toLowerCase())
+            j.nivel.toLowerCase().includes(nivel.toLowerCase())
+        );
+    }
+    
+    if (pais) {
+        resultado = resultado.filter(j => 
+            j.pais.toLowerCase().includes(pais.toLowerCase())
         );
     }
     
     if (buscar) {
         resultado = resultado.filter(j => 
-            j.titulo.toLowerCase().includes(buscar.toLowerCase())
+            j.nickname.toLowerCase().includes(buscar.toLowerCase())
         );
     }
     
@@ -531,84 +596,104 @@ app.get('/juegos', (req, res) => {
         resultado = resultado.slice(0, limite);
     }
     
-    res.json({ total: resultado.length, juegos: resultado });
+    res.json({ total: resultado.length, jugadores: resultado });
 });
 
-// POST - Crear nuevo juego
-app.post('/juegos', (req, res) => {
-    const { titulo, genero, plataforma } = req.body;
+// POST - Registrar nuevo jugador
+app.post('/jugadores', (req, res) => {
+    const { nickname, juego, nivel, pais } = req.body;
     
-    if (!titulo || !genero || !plataforma) {
+    if (!nickname || !juego || !nivel || !pais) {
         return res.status(400).json({ 
             error: "Se requieren todos los campos" 
         });
     }
     
-    const nuevoJuego = {
+    // Verificar nickname único
+    const nicknameExiste = jugadores.find(j => 
+        j.nickname.toLowerCase() === nickname.toLowerCase()
+    );
+    
+    if (nicknameExiste) {
+        return res.status(409).json({ error: "Nickname ya registrado" });
+    }
+    
+    const nuevoJugador = {
         id: proximoId++,
-        titulo,
-        genero,
-        plataforma
+        nickname,
+        juego,
+        nivel,
+        pais
     };
     
-    juegos.push(nuevoJuego);
+    jugadores.push(nuevoJugador);
     res.status(201).json({ 
-        mensaje: "Juego agregado exitosamente",
-        juego: nuevoJuego 
+        mensaje: "Jugador registrado exitosamente",
+        jugador: nuevoJugador 
     });
 });
 
-// PUT - Actualizar juego
-app.put('/juego/:id', (req, res) => {
+// PUT - Actualizar jugador
+app.put('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const { titulo, genero, plataforma } = req.body;
+    const { nickname, juego, nivel, pais } = req.body;
     
-    if (!titulo || !genero || !plataforma) {
+    if (!nickname || !juego || !nivel || !pais) {
         return res.status(400).json({ 
             error: "Se requieren todos los campos" 
         });
     }
     
-    const juego = juegos.find(j => j.id === id);
+    const jugador = jugadores.find(j => j.id === id);
     
-    if (!juego) {
-        return res.status(404).json({ error: "Juego no encontrado" });
+    if (!jugador) {
+        return res.status(404).json({ error: "Jugador no encontrado" });
     }
     
-    juego.titulo = titulo;
-    juego.genero = genero;
-    juego.plataforma = plataforma;
+    // Verificar nickname único (excepto el actual)
+    const nicknameExiste = jugadores.find(j => 
+        j.id !== id && j.nickname.toLowerCase() === nickname.toLowerCase()
+    );
+    
+    if (nicknameExiste) {
+        return res.status(409).json({ error: "Nickname ya en uso" });
+    }
+    
+    jugador.nickname = nickname;
+    jugador.juego = juego;
+    jugador.nivel = nivel;
+    jugador.pais = pais;
     
     res.json({
-        mensaje: "Juego actualizado exitosamente",
-        juego: juego
+        mensaje: "Jugador actualizado exitosamente",
+        jugador: jugador
     });
 });
 
-// DELETE - Eliminar juego
-app.delete('/juego/:id', (req, res) => {
+// DELETE - Descalificar jugador
+app.delete('/jugador/:id', (req, res) => {
     const id = parseInt(req.params.id);
     
-    const indice = juegos.findIndex(j => j.id === id);
+    const indice = jugadores.findIndex(j => j.id === id);
     
     if (indice === -1) {
-        return res.status(404).json({ error: "Juego no encontrado" });
+        return res.status(404).json({ error: "Jugador no encontrado" });
     }
     
-    const juegoEliminado = juegos.splice(indice, 1)[0];
+    const jugadorEliminado = jugadores.splice(indice, 1)[0];
     res.json({ 
-        mensaje: "Juego eliminado exitosamente", 
-        juego: juegoEliminado,
-        totalRestante: juegos.length
+        mensaje: "Jugador descalificado del torneo", 
+        jugador: jugadorEliminado,
+        participantesRestantes: jugadores.length
     });
 });
 
 app.listen(3000, () => {
-    console.log('🎮 GameTracker API funcionando en http://localhost:3000');
+    console.log('🏆 API Torneo Gaming funcionando en http://localhost:3000');
 });
 ```
 
-> 💡 **Próximos Pasos:** En las siguientes clases agregaremos MongoDB, Mongoose, y crearemos el frontend en React para completar el GameTracker.
+> 💡 **Próximos Pasos:** En las siguientes clases trabajaremos con MongoDB, Mongoose, y React para crear el GameTracker completo.
 
 ---
 
@@ -616,38 +701,41 @@ app.listen(3000, () => {
 
 ### 🎯 Conceptos Clave Dominados:
 - **Parámetros de URL:** `:id` → `req.params.id`
-- **Query Parameters:** `?limite=5` → `req.query.limite`
-- **POST:** Crear recursos con `req.body`
+- **Query Parameters:** `?nivel=Pro` → `req.query.nivel`
+- **POST:** Crear recursos con validaciones
 - **PUT:** Actualizar recursos completos
 - **DELETE:** Eliminar recursos
-- **Validaciones:** Verificar datos antes de procesarlos
-- **Status Codes:** 200, 201, 400, 404
+- **Validaciones avanzadas:** Unicidad, campos requeridos
+- **Status Codes:** 200, 201, 400, 404, 409
 
 ### 🛠️ Habilidades Prácticas:
 - ✅ Crear APIs RESTful completas
 - ✅ Manejar diferentes tipos de parámetros
 - ✅ Implementar operaciones CRUD
-- ✅ Validar datos de entrada
-- ✅ Estructurar respuestas JSON
-- ✅ Probar APIs con herramientas como RapidAPI Client
+- ✅ Validar datos de entrada con lógica de negocio
+- ✅ Estructurar respuestas JSON informativas
+- ✅ Probar APIs con herramientas profesionales
 
-### 🚀 Lo Que Viene:
+### 🚀 Lo Que Viene en el Reto GameTracker:
 - Conexión a MongoDB Atlas
-- Modelos con Mongoose
-- Relaciones entre entidades (Juegos ↔ Reseñas)
-- Frontend en React
-- Despliegue de la aplicación
+- Modelos con Mongoose y relaciones
+- Frontend en React con diseño atractivo
+- Subida de imágenes
+- Autenticación de usuarios
+- Despliegue en producción
 
 ---
 
-## 🎊 ¡Felicidades Gamers Developers!
+## 🎊 ¡Felicidades Developers!
 
-**Han completado exitosamente los fundamentos de APIs REST**  
-**Ahora están listos para el desafío GameTracker completo 🎮**
+**Han completado exitosamente los fundamentos de APIs REST con una práctica real de torneos de gaming**  
+**Ahora están preparados para el desafío GameTracker completo 🎮**
 
 ### Tarea para Casa:
-Piensen en 5 videojuegos que les gustaría agregar a su GameTracker y 3 características extra que les gustaría implementar.
+1. **Piensen en su biblioteca personal:** ¿Qué 10 videojuegos agregarían primero a su GameTracker?
+2. **Diseñen una funcionalidad extra:** ¿Qué característica única le añadirían que no esté en Steam o Epic Games?
+3. **Investiguen:** Busquen 3 APIs de videojuegos que podrían integrar (RAWG, IGDB, etc.)
 
 ---
 
-**¿Listos para convertirse en desarrolladores Full Stack de videojuegos? 🚀**
+**¡Prepárense para construir su proyecto Full Stack más ambicioso! 🚀**
