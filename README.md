@@ -463,13 +463,6 @@ app.delete('/jugador/:id', (req, res) => {
 - `PUT /api/reseñas/:id` - Actualizar reseña existente
 - `DELETE /api/reseñas/:id` - Eliminar reseña
 
-#### Requisitos Técnicos:
-- Validaciones con Mongoose
-- Relaciones entre entidades (populate)
-- Manejo de errores
-- Middleware de validación
-- Autenticación (opcional)
-
 ### ⚛️ Frontend - React
 
 #### Componentes Principales:
@@ -487,7 +480,6 @@ app.delete('/jugador/:id', (req, res) => {
 - Sistema de puntuación con estrellas ⭐
 - Escribir reseñas detalladas
 - Registro de horas jugadas
-- Diseño responsive y atractivo
 
 ### ✨ Características Extra (Opcionales)
 
@@ -512,9 +504,6 @@ app.delete('/jugador/:id', (req, res) => {
 |----|------------|-------------|
 | ✅ | **Backend** | API REST completa con estructura clara, modelos Mongoose y validaciones |
 | ✅ | **Frontend** | Aplicación React funcional con diseño atractivo y todas las funcionalidades |
-| ✅ | **Documentación** | README detallado con instrucciones de instalación y capturas |
-| ✅ | **Datos de Prueba** | Base de datos populada con juegos populares y reseñas ejemplo |
-| ✅ | **Deploy** | Aplicación desplegada en plataformas como Netlify/Vercel + Railway/Render |
 
 ### 🎯 Diferencias Clave entre Práctica y Reto:
 
